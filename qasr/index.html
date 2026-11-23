@@ -254,7 +254,7 @@ canvas#fx{position:fixed;inset:0;pointer-events:none;z-index:80}
 <!-- ========== TEAMS: BOARD ========== -->
 <section class="screen" id="s-board">
   <div class="top">
-    <button class="btn sm ghost" onclick="if(confirm('إنهاء التحدي وعرض النتيجة؟'))boardEnd()">🏁 إنهاء</button>
+    <button class="btn sm ghost" onclick="ask('إنهاء التحدي وعرض النتيجة؟',boardEnd,'إنهاء')">🏁 إنهاء</button>
     <div class="row"><button class="btn sm ghost" onclick="toggleSound()" id="sndBtn2">🔊</button><button class="btn sm" onclick="nextTurn();renderBoard()">تبديل الدور ↺</button></div>
   </div>
   <div class="scores" id="scores"></div>
@@ -392,6 +392,17 @@ function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.to
 let toastT;function toast(m){const t=$('toast');t.textContent=m;t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),2200)}
 function openG(html){$('mgBox').innerHTML=html;$('mg').classList.add('on')}
 function closeG(){$('mg').classList.remove('on')}
+// in-page confirmation (no native confirm/prompt)
+let _askCb={};
+function ask(msg,yes,yesLabel='نعم',noCb,noLabel='إلغاء'){
+  _askCb={yes,no:noCb};
+  openG(`<h3 style="margin-bottom:14px">${esc(msg)}</h3><div class="row"><button class="btn gold" onclick="closeG();_askCb.yes&&_askCb.yes()">${esc(yesLabel)}</button><button class="btn ghost" onclick="closeG();_askCb.no&&_askCb.no()">${esc(noLabel)}</button></div>`);
+}
+function askText(msg,cb){
+  _askCb={yes:()=>cb($('askIn').value.trim())};
+  openG(`<h3>${esc(msg)}</h3><input id="askIn" style="margin:12px 0"><div class="row"><button class="btn gold" onclick="_askCb.yes();closeG()">حفظ</button><button class="btn ghost" onclick="closeG()">إلغاء</button></div>`);
+  setTimeout(()=>$('askIn').focus(),100);
+}
 // options shuffled for display; returns [{t,ok}]
 function mixOpts(q){return shuffle(q.opts.map((t,i)=>({t,ok:i===q.a})).filter(o=>o.t.trim()!==''))}
 
@@ -449,7 +460,7 @@ function advMap(){
     return `<button class="room ${st}" onclick="advRoom(${i})">${st==='done'?'<span class="badge">🗝️</span>':st==='lock'?'<span class="badge">🔒</span>':''}<span class="ri">${c.icon}</span><b>${esc(c.name)}</b><small>الغرفة ${AR(i+1)}</small></button>`}).join('')
    +`<div class="room ${cur>=A.rooms.length?'open':'lock'}" style="border-color:var(--gold2)"><span class="ri">💰</span><b>خزنة الكنز</b><small>${AR(A.rooms.length)} مفاتيح</small></div>`;
 }
-function confirmQuit(){if(confirm('الخروج من المغامرة؟ ستفقد تقدمك.')){stopTimer();show('s-home')}}
+function confirmQuit(){ask('الخروج من المغامرة؟ ستفقد تقدمك.',()=>{stopTimer();show('s-home');renderLB()},'خروج')}
 function advRoom(i){
   const id=A.rooms[i];
   let pool=DB.qs.filter(q=>q.cat===id&&!A.used.has(q.id));
@@ -666,17 +677,17 @@ function qSave(id){
   if(id)Object.assign(DB.qs.find(x=>x.id===id),d);else DB.qs.push({id:uid(),...d});
   save();closeG();toast('تم الحفظ ✔');tQs();
 }
-function qDel(id){if(!confirm('حذف هذا السؤال؟'))return;DB.qs=DB.qs.filter(q=>q.id!==id);save();closeG();toast('تم الحذف');tQs()}
+function qDel(id){ask('حذف هذا السؤال؟',()=>{DB.qs=DB.qs.filter(q=>q.id!==id);save();toast('تم الحذف');tQs()},'حذف')}
 function tCats(){
   $('tBody').innerHTML=`<div class="card">
     ${DB.cats.map((c,i)=>`<div class="qitem" style="align-items:center"><input value="${esc(c.icon)}" style="width:56px;text-align:center" onchange="DB.cats[${i}].icon=this.value;save()"><input value="${esc(c.name)}" style="flex:1" onchange="DB.cats[${i}].name=this.value;save()">
       <button class="btn sm" onclick="catMove(${i},-1)" ${i===0?'disabled':''}>▲</button><button class="btn sm red" onclick="catDel(${i})">🗑️</button></div>`).join('')}
     <div class="row" style="margin-top:12px"><button class="btn gold sm" onclick="catAdd()">＋ قسم جديد</button><span class="mute" style="font-size:13px">ترتيب الأقسام = ترتيب غرف القصر</span></div></div>`;
 }
-function catAdd(){const n=prompt('اسم القسم الجديد:');if(!n)return;DB.cats.push({id:uid(),name:n.trim(),icon:'⭐'});save();tCats()}
+function catAdd(){askText('اسم القسم الجديد',n=>{if(!n)return;DB.cats.push({id:uid(),name:n,icon:'⭐'});save();tCats()})}
 function catMove(i,d){const j=i+d;[DB.cats[i],DB.cats[j]]=[DB.cats[j],DB.cats[i]];save();tCats()}
 function catDel(i){const c=DB.cats[i];const n=DB.qs.filter(q=>q.cat===c.id).length;
-  if(!confirm(`حذف قسم «${c.name}» و${n} سؤالاً بداخله؟`))return;DB.qs=DB.qs.filter(q=>q.cat!==c.id);DB.cats.splice(i,1);save();tCats()}
+  ask(`حذف قسم «${c.name}» و${n} سؤالاً بداخله؟`,()=>{DB.qs=DB.qs.filter(q=>q.cat!==c.id);DB.cats.splice(i,1);save();tCats()},'حذف')}
 function tSet(){
   $('tBody').innerHTML=`<div class="card form">
     <h3>💾 نسخ الأسئلة ونقلها</h3>
@@ -687,12 +698,12 @@ function tSet(){
     <div class="row"><input id="newPin" type="password" inputmode="numeric" placeholder="رمز جديد" style="flex:1;width:auto"><button class="btn sm" onclick="setPin()">تغيير</button></div>
     <hr style="border:0;border-top:1px solid var(--line);width:100%">
     <h3>🧹 إعادة الضبط</h3>
-    <div class="row"><button class="btn red sm" onclick="if(confirm('مسح لوحة الأبطال؟')){DB.lb=[];save();toast('تم المسح')}">مسح لوحة الأبطال</button>
+    <div class="row"><button class="btn red sm" onclick="ask('مسح لوحة الأبطال؟',()=>{DB.lb=[];save();toast('تم المسح')},'مسح')">مسح لوحة الأبطال</button>
     <button class="btn red sm" onclick="resetAll()">استعادة الأسئلة الأصلية</button></div>
   </div>`;
 }
 function setPin(){const p=$('newPin').value.trim();if(p.length<4){toast('الرمز ٤ أرقام على الأقل');return}DB.pin=p;save();toast('تم تغيير الرمز ✔');$('newPin').value=''}
-function resetAll(){if(!confirm('سيتم حذف كل أسئلتك وأقسامك واستعادة الأسئلة الأصلية. متأكد؟'))return;const d=defaults();d.pin=DB.pin;d.lb=DB.lb;d.sound=DB.sound;DB=d;save();toast('تمت الاستعادة');tTab('q')}
+function resetAll(){ask('سيتم حذف كل أسئلتك وأقسامك واستعادة الأسئلة الأصلية. متأكد؟',()=>{const d=defaults();d.pin=DB.pin;d.lb=DB.lb;d.sound=DB.sound;DB=d;save();toast('تمت الاستعادة');tTab('q')},'استعادة')}
 async function expJson(){
   const data=JSON.stringify({app:'qasr',v:1,cats:DB.cats,qs:DB.qs},null,1);
   const name='أسئلة-حارس-القصر.json';
@@ -703,9 +714,8 @@ async function expJson(){
 function impJson(file){
   if(!file)return;const r=new FileReader();
   r.onload=()=>{try{const d=JSON.parse(r.result);if(!Array.isArray(d.cats)||!Array.isArray(d.qs))throw 0;
-    const mode=confirm('اضغط «موافق» لاستبدال كل الأسئلة الحالية، أو «إلغاء» لدمجها مع الموجودة.');
-    if(mode){DB.cats=d.cats;DB.qs=d.qs}else{d.cats.forEach(c=>{if(!DB.cats.some(x=>x.id===c.id))DB.cats.push(c)});d.qs.forEach(q=>{if(!DB.qs.some(x=>x.id===q.id))DB.qs.push(q)})}
-    save();toast(`تم الاستيراد: ${AR(d.qs.length)} سؤال`);tTab('q')}catch(e){toast('الملف غير صالح')}};
+    const done=()=>{save();toast(`تم الاستيراد: ${AR(d.qs.length)} سؤال`);tTab('q')};
+    ask('كيف تريد استيراد الأسئلة؟',()=>{DB.cats=d.cats;DB.qs=d.qs;done()},'استبدال الكل',()=>{d.cats.forEach(c=>{if(!DB.cats.some(x=>x.id===c.id))DB.cats.push(c)});d.qs.forEach(q=>{if(!DB.qs.some(x=>x.id===q.id))DB.qs.push(q)});done()},'دمج مع الموجود')}catch(e){toast('الملف غير صالح')}};
   r.readAsText(file);
 }
 document.addEventListener('keydown',e=>{
