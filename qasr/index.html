@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0d1330">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>حارس القصر</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=El+Messiri:wght@500;700&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0d1330;--bg2:#161e47;--card:#1d2757;--card2:#24306a;--line:#33407f;
+  --gold:#f2c14e;--gold2:#ffdd85;--ink:#f4f1e8;--mute:#a9b0d6;
+  --ok:#2fbf71;--bad:#e5484d;--blue:#4c8dff;
+  --r:18px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%}
+body{
+  background:radial-gradient(ellipse at 50% -10%,#2a3680 0%,var(--bg) 55%) fixed,var(--bg);
+  color:var(--ink);font-family:'Tajawal',system-ui,sans-serif;font-size:17px;line-height:1.6;
+  min-height:100vh;overflow-x:hidden;
+  padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;
+  background-image:radial-gradient(1.5px 1.5px at 10% 20%,#fff8 50%,transparent 51%),radial-gradient(1px 1px at 30% 70%,#fff6 50%,transparent 51%),radial-gradient(1.5px 1.5px at 70% 15%,#fff7 50%,transparent 51%),radial-gradient(1px 1px at 85% 55%,#fff5 50%,transparent 51%),radial-gradient(1px 1px at 50% 40%,#fff4 50%,transparent 51%),radial-gradient(1.5px 1.5px at 20% 90%,#fff5 50%,transparent 51%);}
+h1,h2,h3{font-family:'El Messiri',serif;margin:0;line-height:1.3}
+button{font-family:inherit;font-size:inherit;color:inherit;border:0;cursor:pointer;background:none}
+input,select,textarea{font-family:inherit;font-size:16px;color:var(--ink);background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:10px 12px;width:100%}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--gold);outline-offset:1px}
+.wrap{max-width:980px;margin:0 auto;padding:16px}
+.screen{display:none;animation:fade .35s ease}
+.screen.on{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 20px;border-radius:14px;font-weight:700;background:var(--card2);border:1px solid var(--line);transition:transform .12s,background .2s}
+.btn:active{transform:scale(.96)}
+.btn.gold{background:linear-gradient(180deg,var(--gold2),var(--gold));color:#3a2600;border:0;box-shadow:0 6px 20px #f2c14e40}
+.btn.ghost{background:transparent}
+.btn.sm{padding:8px 14px;font-size:15px;border-radius:11px}
+.btn.red{background:#5a1f2a;border-color:#8a2f3d}
+.btn:disabled{opacity:.4;pointer-events:none}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}
+.mute{color:var(--mute)}
+.card{background:linear-gradient(180deg,var(--card),var(--bg2));border:1px solid var(--line);border-radius:var(--r);padding:18px}
+.footer{text-align:center;color:var(--mute);font-size:13px;padding:24px 0 10px}
+
+/* HOME */
+.hero{text-align:center;padding:26px 0 10px}
+.castle{font-size:84px;filter:drop-shadow(0 8px 24px #f2c14e55);animation:float 4s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(-8px)}}
+.hero h1{font-size:44px;background:linear-gradient(180deg,var(--gold2),var(--gold));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{margin:6px 0 0;color:var(--mute)}
+.modes{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-top:22px}
+.mode{text-align:right;padding:22px;border-radius:22px;background:linear-gradient(160deg,var(--card2),var(--bg2));border:1px solid var(--line);transition:transform .15s,border-color .2s;position:relative;overflow:hidden}
+.mode:hover{border-color:var(--gold)}
+.mode:active{transform:scale(.98)}
+.mode .ic{font-size:44px}
+.mode h2{font-size:24px;margin:6px 0 4px;color:var(--gold2)}
+.mode p{margin:0;color:var(--mute);font-size:15px}
+.mode .tag{position:absolute;top:16px;left:16px;font-size:12px;background:#0006;border:1px solid var(--line);padding:3px 10px;border-radius:99px;color:var(--mute)}
+.lb{margin-top:18px}
+.lb ol{margin:8px 0 0;padding:0 22px 0 0}
+.lb li{padding:4px 0;border-bottom:1px dashed var(--line);display:flex;justify-content:space-between}
+
+/* ADVENTURE */
+.hud{display:flex;gap:8px;flex-wrap:wrap}
+.pill{background:var(--bg2);border:1px solid var(--line);border-radius:99px;padding:6px 14px;font-weight:700;display:inline-flex;gap:6px;align-items:center;white-space:nowrap}
+.rooms{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;margin-top:10px}
+.room{aspect-ratio:3/4;border-radius:70px 70px 14px 14px;border:2px solid var(--line);background:linear-gradient(180deg,#2b376f,#141b40);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:10px;text-align:center;position:relative;transition:transform .15s}
+.room .ri{font-size:40px}
+.room b{font-family:'El Messiri';font-size:18px}
+.room small{color:var(--mute);font-size:13px}
+.room.open{border-color:var(--gold);box-shadow:0 0 0 4px #f2c14e22,0 10px 30px #f2c14e33;animation:glow 2s infinite}
+@keyframes glow{50%{box-shadow:0 0 0 7px #f2c14e18,0 10px 34px #f2c14e55}}
+.room.done{border-color:var(--ok);background:linear-gradient(180deg,#1f5a43,#122a2a)}
+.room.lock{opacity:.45;pointer-events:none}
+.room .badge{position:absolute;top:8px;font-size:22px}
+.qbox{max-width:760px;margin:0 auto}
+.qhead{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}
+.timer{height:8px;background:var(--bg2);border-radius:99px;overflow:hidden;margin:6px 0 16px}
+.timer i{display:block;height:100%;background:linear-gradient(90deg,var(--bad),var(--gold),var(--ok));width:100%;transition:width .25s linear}
+.qtext{font-size:24px;font-weight:800;text-align:center;padding:24px 16px;min-height:120px;display:flex;align-items:center;justify-content:center}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:560px){.opts{grid-template-columns:1fr}.qtext{font-size:21px}.hero h1{font-size:36px}}
+.opt{background:var(--card2);border:2px solid var(--line);border-radius:16px;padding:14px 16px;font-size:18px;font-weight:700;text-align:right;display:flex;gap:12px;align-items:center;transition:transform .12s,background .2s,border-color .2s}
+.opt:active{transform:scale(.97)}
+.opt .k{flex:none;width:32px;height:32px;border-radius:10px;background:var(--bg);display:grid;place-items:center;color:var(--gold);font-size:16px}
+.opt.ok{background:#1d5c3f;border-color:var(--ok)}
+.opt.bad{background:#5c1d27;border-color:var(--bad);animation:shake .35s}
+.opt.gone{visibility:hidden}
+.opt:disabled{cursor:default}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.lifes{display:flex;gap:8px;justify-content:center;margin-top:14px;flex-wrap:wrap}
+.feedback{text-align:center;font-weight:800;font-size:20px;min-height:34px;margin-top:12px}
+.center{text-align:center}
+.big{font-size:72px}
+.chest{font-size:110px;animation:pop .8s cubic-bezier(.2,1.6,.4,1)}
+@keyframes pop{from{transform:scale(.2) rotate(-20deg);opacity:0}}
+
+/* TEAMS */
+.setup-teams{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{padding:8px 14px;border-radius:99px;border:1px solid var(--line);background:var(--bg2);font-weight:700}
+.chip.on{background:var(--gold);color:#3a2600;border-color:var(--gold)}
+.scores{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));margin-bottom:14px}
+.score{border-radius:16px;padding:10px 14px;background:var(--bg2);border:2px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:8px;transition:all .25s}
+.score.turn{border-color:var(--tc);box-shadow:0 0 0 4px color-mix(in srgb,var(--tc) 25%,transparent);transform:translateY(-2px)}
+.score .nm{font-weight:800;color:var(--tc)}
+.score .pt{font-size:26px;font-weight:800;font-family:'El Messiri'}
+.score .lf{font-size:12px;color:var(--mute)}
+.board{display:grid;gap:8px;overflow-x:auto}
+.bh{background:linear-gradient(180deg,var(--card2),var(--bg2));border:1px solid var(--line);border-radius:12px;text-align:center;padding:10px 4px;font-weight:800;font-size:15px;line-height:1.3;min-height:66px;display:flex;flex-direction:column;justify-content:center}
+.bh span{font-size:22px}
+.cell{background:linear-gradient(180deg,#2d3d94,#1b2563);border:1px solid #3e50b3;border-radius:12px;font-family:'El Messiri';font-size:26px;font-weight:700;color:var(--gold2);padding:14px 0;transition:transform .12s}
+.cell:active{transform:scale(.95)}
+.cell.used{background:var(--bg2);color:transparent;border-color:var(--line);pointer-events:none}
+.cell.used::after{content:"✓";color:var(--mute);font-size:18px}
+@media(max-width:560px){.cell{font-size:18px;padding:10px 0}.bh{font-size:12px;min-height:58px}.bh span{font-size:18px}}
+
+/* MODAL */
+.modal{position:fixed;inset:0;background:#05081cdd;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:none;align-items:flex-start;justify-content:center;z-index:50;overflow-y:auto;padding:max(16px,env(safe-area-inset-top)) 16px 16px}
+.modal.on{display:flex}
+.mbox{width:100%;max-width:820px;margin:auto 0;animation:fade .25s}
+.steal{margin-top:14px;text-align:center}
+
+/* TEACHER */
+.tabs{display:flex;gap:6px;margin-bottom:14px;overflow-x:auto}
+.tab{padding:9px 16px;border-radius:12px;background:var(--bg2);border:1px solid var(--line);font-weight:700;white-space:nowrap}
+.tab.on{background:var(--gold);color:#3a2600;border-color:var(--gold)}
+.qitem{display:flex;gap:10px;align-items:flex-start;padding:12px;border-bottom:1px solid var(--line)}
+.qitem .t{flex:1;min-width:0}
+.qitem .t b{display:block}
+.qitem .t small{color:var(--mute)}
+.lvl{flex:none;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:2px 8px;font-size:13px;color:var(--gold)}
+.form{display:grid;gap:10px}
+.form label{font-size:14px;color:var(--mute);display:grid;gap:4px}
+.optedit{display:grid;grid-template-columns:auto 1fr;gap:8px;align-items:center}
+.optedit input[type=radio]{width:22px;height:22px;accent-color:var(--ok)}
+.toast{position:fixed;bottom:calc(20px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%) translateY(120px);background:var(--gold);color:#3a2600;font-weight:800;padding:10px 20px;border-radius:99px;transition:transform .3s;z-index:99;box-shadow:0 10px 30px #0008}
+.toast.on{transform:translateX(-50%) translateY(0)}
+canvas#fx{position:fixed;inset:0;pointer-events:none;z-index:80}
+</style>
+</head>
+<body>
+<canvas id="fx"></canvas>
+<div class="wrap">
+
+<!-- ========== HOME ========== -->
+<section class="screen on" id="s-home">
+  <div class="top">
+    <button class="btn sm ghost" onclick="toggleSound()" id="sndBtn">🔊</button>
+    <button class="btn sm" onclick="openTeacher()">🔐 لوحة المعلم</button>
+  </div>
+  <div class="hero">
+    <div class="castle">🏰</div>
+    <h1>حارس القصر</h1>
+    <p>مغامرة ثقافية: اجمع المفاتيح وافتح خزنة الكنز</p>
+  </div>
+  <div class="modes">
+    <button class="mode" onclick="advStart()">
+      <span class="tag">فردي · جوال</span>
+      <div class="ic">🗝️</div>
+      <h2>مغامرة القصر</h2>
+      <p>ادخل غرف القصر واحدة تلو الأخرى، وأجب عن أسئلة كل غرفة لتحصل على مفتاحها. معك ثلاث أرواح فقط.</p>
+    </button>
+    <button class="mode" onclick="show('s-tsetup');renderSetup()">
+      <span class="tag">جماعي · شاشة الفصل</span>
+      <div class="ic">⚔️</div>
+      <h2>تحدي الفرق</h2>
+      <p>لوحة أسئلة بالنقاط من ١٠٠ إلى ٥٠٠ لفريقين إلى أربعة فرق، مع وسائل مساعدة وسرقة النقاط.</p>
+    </button>
+  </div>
+  <div class="card lb">
+    <h3>🏆 أبطال القصر <small class="mute">(على هذا الجهاز)</small></h3>
+    <ol id="lbList"></ol>
+  </div>
+  <div class="footer">أ. زيد علي آل رقيب</div>
+</section>
+
+<!-- ========== ADVENTURE: NAME ========== -->
+<section class="screen" id="s-aname">
+  <div class="card qbox center" style="max-width:460px">
+    <div class="big">🛡️</div>
+    <h2>من أنت أيها الفارس؟</h2>
+    <div class="form" style="margin-top:14px;text-align:right">
+      <label>الاسم<input id="pName" maxlength="24" placeholder="اكتب اسمك"></label>
+      <label>الصف
+        <select id="pClass"><option>أول متوسط</option><option>ثاني متوسط</option><option>ثالث متوسط</option></select>
+      </label>
+      <button class="btn gold" onclick="advBegin()">ادخل القصر ⚔️</button>
+      <button class="btn ghost" onclick="show('s-home')">رجوع</button>
+    </div>
+  </div>
+</section>
+
+<!-- ========== ADVENTURE: MAP ========== -->
+<section class="screen" id="s-amap">
+  <div class="top">
+    <button class="btn sm ghost" onclick="confirmQuit()">✕ خروج</button>
+    <div class="hud" id="hudMap"></div>
+  </div>
+  <div class="card">
+    <h2>🗺️ خريطة القصر</h2>
+    <p class="mute" style="margin:4px 0 0">اختر الغرفة المضيئة. أجب عن ٣ من ٤ أسئلة على الأقل لتأخذ مفتاحها.</p>
+    <div class="rooms" id="rooms"></div>
+  </div>
+</section>
+
+<!-- ========== ADVENTURE: QUESTION ========== -->
+<section class="screen" id="s-aq">
+  <div class="qbox">
+    <div class="qhead">
+      <div class="pill" id="aqRoom"></div>
+      <div class="hud" id="hudQ"></div>
+    </div>
+    <div class="timer"><i id="aqTimer"></i></div>
+    <div class="card qtext" id="aqText"></div>
+    <div class="opts" id="aqOpts" style="margin-top:12px"></div>
+    <div class="feedback" id="aqFb"></div>
+    <div class="lifes">
+      <button class="btn sm" id="ll50" onclick="adv5050()">✂️ حذف إجابتين</button>
+      <button class="btn sm" id="llSkip" onclick="advSkip()">⏭️ تخطي السؤال</button>
+    </div>
+  </div>
+</section>
+
+<!-- ========== ADVENTURE: END ========== -->
+<section class="screen" id="s-aend">
+  <div class="card qbox center" id="aendBox"></div>
+</section>
+
+<!-- ========== TEAMS: SETUP ========== -->
+<section class="screen" id="s-tsetup">
+  <div class="top">
+    <button class="btn sm ghost" onclick="show('s-home')">→ رجوع</button>
+    <h2>⚔️ إعداد التحدي</h2>
+  </div>
+  <div class="card form">
+    <label>عدد الفرق
+      <div class="chips" id="teamCount"></div>
+    </label>
+    <div class="setup-teams" id="teamNames"></div>
+    <label>الأقسام على اللوحة (حتى ٦)
+      <div class="chips" id="catPick"></div>
+    </label>
+    <label>وقت السؤال
+      <div class="chips" id="timePick"></div>
+    </label>
+    <button class="btn gold" onclick="boardStart()">ابدأ التحدي 🚀</button>
+  </div>
+</section>
+
+<!-- ========== TEAMS: BOARD ========== -->
+<section class="screen" id="s-board">
+  <div class="top">
+    <button class="btn sm ghost" onclick="if(confirm('إنهاء التحدي وعرض النتيجة؟'))boardEnd()">🏁 إنهاء</button>
+    <div class="row"><button class="btn sm ghost" onclick="toggleSound()" id="sndBtn2">🔊</button><button class="btn sm" onclick="nextTurn();renderBoard()">تبديل الدور ↺</button></div>
+  </div>
+  <div class="scores" id="scores"></div>
+  <div class="board" id="board"></div>
+</section>
+
+<!-- ========== TEAMS: END ========== -->
+<section class="screen" id="s-tend">
+  <div class="card qbox center" id="tendBox"></div>
+</section>
+
+<!-- ========== TEACHER ========== -->
+<section class="screen" id="s-teacher">
+  <div class="top">
+    <button class="btn sm ghost" onclick="show('s-home');renderLB()">→ خروج</button>
+    <h2>🔐 لوحة المعلم</h2>
+  </div>
+  <div class="tabs">
+    <button class="tab on" data-t="q" onclick="tTab('q')">الأسئلة</button>
+    <button class="tab" data-t="c" onclick="tTab('c')">الأقسام</button>
+    <button class="tab" data-t="s" onclick="tTab('s')">الإعدادات والنسخ</button>
+  </div>
+  <div id="tBody"></div>
+</section>
+
+</div>
+
+<!-- question modal for team mode -->
+<div class="modal" id="mq"><div class="mbox" id="mqBox"></div></div>
+<!-- generic modal -->
+<div class="modal" id="mg"><div class="mbox card" id="mgBox" style="max-width:560px"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ================= DATA ================= */
+const KEY='qasr_v1';
+const DEF_CATS=[
+ {id:'his',name:'التاريخ',icon:'📜'},
+ {id:'geo',name:'الجغرافيا',icon:'🌍'},
+ {id:'sci',name:'العلوم',icon:'🔬'},
+ {id:'ar', name:'لغتي',icon:'✍️'},
+ {id:'isl',name:'الثقافة الإسلامية',icon:'🕌'},
+ {id:'sa', name:'وطني',icon:'🇸🇦'}
+];
+// [cat, level(1-5), question, [correct, wrong, wrong, wrong]]
+const DEF_Q=[
+ ['his',1,'ما أول عاصمة للدولة السعودية الأولى؟',['الدرعية','الرياض','حائل','جدة']],
+ ['his',1,'من الصحابي الملقب بـ«الفاروق»؟',['عمر بن الخطاب','أبو بكر الصديق','علي بن أبي طالب','خالد بن الوليد']],
+ ['his',2,'في أي عام استرد الملك عبدالعزيز الرياض؟',['1319هـ','1351هـ','1300هـ','1343هـ']],
+ ['his',2,'في أي عام أُعلن توحيد المملكة العربية السعودية؟',['1351هـ','1319هـ','1373هـ','1330هـ']],
+ ['his',3,'من مؤسس الدولة السعودية الأولى؟',['الإمام محمد بن سعود','الإمام تركي بن عبدالله','الملك عبدالعزيز','الإمام فيصل بن تركي']],
+ ['his',3,'من مؤسس الدولة السعودية الثانية؟',['الإمام تركي بن عبدالله','الإمام محمد بن سعود','الإمام عبدالله بن سعود','الملك سعود']],
+ ['his',4,'في أي سنة هجرية كانت غزوة بدر الكبرى؟',['2هـ','5هـ','8هـ','10هـ']],
+ ['his',4,'من القائد الذي فتح الأندلس؟',['طارق بن زياد','عقبة بن نافع','صلاح الدين الأيوبي','عمرو بن العاص']],
+ ['his',5,'من قائد المسلمين في معركة حطين؟',['صلاح الدين الأيوبي','قطز','نور الدين زنكي','هارون الرشيد']],
+ ['his',5,'ما المدينة التي بناها أبو جعفر المنصور عاصمةً للدولة العباسية؟',['بغداد','دمشق','القاهرة','سامراء']],
+
+ ['geo',1,'ما عاصمة المملكة العربية السعودية؟',['الرياض','جدة','مكة المكرمة','الدمام']],
+ ['geo',1,'ما الصحراء الرملية الكبرى في جنوب المملكة؟',['الربع الخالي','النفود الكبير','الدهناء','الصحراء الكبرى']],
+ ['geo',2,'ما أطول نهر في العالم؟',['النيل','الأمازون','دجلة','الفرات']],
+ ['geo',2,'ما أكبر قارات العالم مساحة؟',['آسيا','أفريقيا','أوروبا','أمريكا الشمالية']],
+ ['geo',3,'ما أعلى قمة جبلية في العالم؟',['إيفرست','كليمنجارو','الألب','طوبقال']],
+ ['geo',3,'ما البحر الذي يحد المملكة من الغرب؟',['البحر الأحمر','الخليج العربي','بحر العرب','البحر المتوسط']],
+ ['geo',4,'ما أكبر محيطات العالم؟',['المحيط الهادئ','المحيط الأطلسي','المحيط الهندي','المحيط المتجمد الشمالي']],
+ ['geo',4,'في أي منطقة إدارية تقع محافظة العُلا؟',['المدينة المنورة','تبوك','حائل','الجوف']],
+ ['geo',5,'إلى نصفين يقسم خط الاستواء الأرض، فما هما؟',['شمالي وجنوبي','شرقي وغربي','علوي وسفلي','قطبي واستوائي']],
+ ['geo',5,'ما أصغر دولة في العالم مساحة؟',['الفاتيكان','موناكو','البحرين','المالديف']],
+
+ ['sci',1,'ما الكوكب الأقرب إلى الشمس؟',['عطارد','الزهرة','المريخ','الأرض']],
+ ['sci',1,'ما الغاز الذي نحتاجه للتنفس؟',['الأكسجين','ثاني أكسيد الكربون','النيتروجين','الهيليوم']],
+ ['sci',2,'كم عدد عظام جسم الإنسان البالغ؟',['206','300','150','256']],
+ ['sci',2,'ما الرمز الكيميائي للذهب؟',['Au','Ag','Go','Fe']],
+ ['sci',3,'ما درجة غليان الماء عند مستوى سطح البحر؟',['100 °س','90 °س','120 °س','80 °س']],
+ ['sci',3,'ما أكبر كواكب المجموعة الشمسية؟',['المشتري','زحل','الأرض','نبتون']],
+ ['sci',4,'من العالم المسلم الرائد في علم البصريات؟',['ابن الهيثم','ابن سينا','الخوارزمي','جابر بن حيان']],
+ ['sci',4,'ما الوحدة الأساسية في بناء الكائن الحي؟',['الخلية','النسيج','العضو','الذرة']],
+ ['sci',5,'كم تبلغ سرعة الضوء تقريباً؟',['300 ألف كم/ث','30 ألف كم/ث','3 آلاف كم/ث','3 ملايين كم/ث']],
+ ['sci',5,'كم عدد الكروموسومات في الخلية الجسمية للإنسان؟',['46','23','44','48']],
+
+ ['ar',1,'ما جمع كلمة «كتاب»؟',['كُتُب','كتابات','كاتبون','مكاتب']],
+ ['ar',1,'ما ضد كلمة «الشجاعة»؟',['الجُبن','الكرم','القوة','الصبر']],
+ ['ar',2,'من الشاعر الملقب بـ«أمير الشعراء»؟',['أحمد شوقي','حافظ إبراهيم','المتنبي','نزار قباني']],
+ ['ar',2,'ما حكم الفاعل في اللغة العربية؟',['مرفوع','منصوب','مجرور','مجزوم']],
+ ['ar',3,'أكمل المثل: «في التأني السلامة وفي العجلة ...»',['الندامة','الخسارة','السرعة','المشقة']],
+ ['ar',3,'ما عمل «إنّ» وأخواتها؟',['تنصب المبتدأ وترفع الخبر','ترفع المبتدأ وتنصب الخبر','تجر الاسم','تجزم الفعل']],
+ ['ar',4,'من قائل: «الخيل والليل والبيداء تعرفني»؟',['المتنبي','عنترة بن شداد','أبو تمام','البحتري']],
+ ['ar',4,'ما نوع «ال» في كلمة «الشمس»؟',['شمسية','قمرية','موصولة','زائدة']],
+ ['ar',5,'من واضع علم العروض؟',['الخليل بن أحمد الفراهيدي','سيبويه','الأصمعي','الجاحظ']],
+ ['ar',5,'أكمل: «إذا كان الكلام من فضة فالسكوت من ...»',['ذهب','حديد','نحاس','ماس']],
+
+ ['isl',1,'كم عدد أركان الإسلام؟',['خمسة','ستة','أربعة','ثلاثة']],
+ ['isl',1,'ما أطول سورة في القرآن الكريم؟',['البقرة','آل عمران','النساء','الكهف']],
+ ['isl',2,'ما أول مسجد بُني في الإسلام؟',['مسجد قباء','المسجد النبوي','المسجد الحرام','المسجد الأقصى']],
+ ['isl',2,'كم عدد سور القرآن الكريم؟',['114','110','120','99']],
+ ['isl',3,'ما السورة التي تعدل ثلث القرآن؟',['الإخلاص','الفاتحة','الكوثر','الملك']],
+ ['isl',3,'من الصحابي الملقب بـ«ذي النورين»؟',['عثمان بن عفان','علي بن أبي طالب','عمر بن الخطاب','الزبير بن العوام']],
+ ['isl',4,'ما الغزوة التي تُسمى «غزوة الأحزاب»؟',['الخندق','أحد','تبوك','حنين']],
+ ['isl',4,'ما السورة التي لا تبدأ بالبسملة؟',['التوبة','الأنفال','يس','الفتح']],
+ ['isl',5,'من الصحابي الذي كلّفه أبو بكر بجمع القرآن؟',['زيد بن ثابت','أبي بن كعب','عبدالله بن مسعود','معاذ بن جبل']],
+ ['isl',5,'من أول من أسلم من الصبيان؟',['علي بن أبي طالب','زيد بن حارثة','أنس بن مالك','عبدالله بن عباس']],
+
+ ['sa',1,'ما لون علم المملكة العربية السعودية؟',['أخضر','أحمر','أزرق','أسود']],
+ ['sa',1,'في أي يوم يوافق اليوم الوطني السعودي؟',['23 سبتمبر','22 فبراير','1 يناير','11 مارس']],
+ ['sa',2,'في أي يوم يوافق يوم التأسيس؟',['22 فبراير','23 سبتمبر','15 مايو','1 محرم']],
+ ['sa',2,'ما عملة المملكة العربية السعودية؟',['الريال','الدينار','الدرهم','الجنيه']],
+ ['sa',3,'كم عدد المناطق الإدارية في المملكة؟',['13','10','15','12']],
+ ['sa',3,'ما المدينة الملقبة بـ«عروس البحر الأحمر»؟',['جدة','ينبع','أملج','جازان']],
+ ['sa',4,'ما أول موقع سعودي سُجّل في قائمة التراث العالمي لليونسكو؟',['الحِجر (مدائن صالح)','حي الطريف بالدرعية','جدة التاريخية','واحة الأحساء']],
+ ['sa',4,'ما المشروع الذي يضم مدينة «ذا لاين»؟',['نيوم','القدية','البحر الأحمر','العلا']],
+ ['sa',5,'من مؤلف كلمات النشيد الوطني السعودي؟',['إبراهيم خفاجي','غازي القصيبي','محمد العيد الخطراوي','عبدالله الفيصل']],
+ ['sa',5,'أي مدينة احتضنت قمة مجموعة العشرين برئاسة المملكة عام 2020م؟',['الرياض','جدة','الدمام','نيوم']]
+];
+let DB;
+function uid(){return Math.random().toString(36).slice(2,9)}
+function defaults(){
+  return {cats:DEF_CATS.map(c=>({...c})),
+    qs:DEF_Q.map(([cat,lvl,q,o])=>({id:uid(),cat,lvl,q,opts:o.slice(),a:0})),
+    pin:'1234',lb:[],sound:true};
+}
+function load(){
+  try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&s.cats&&s.qs){DB=s;return}}catch(e){}
+  DB=defaults();save();
+}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(DB))}catch(e){}}
+load();
+
+/* ================= HELPERS ================= */
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const AR=n=>String(n).replace(/\d/g,d=>'٠١٢٣٤٥٦٧٨٩'[d]);
+const KEYS=['أ','ب','ج','د'];
+const catOf=id=>DB.cats.find(c=>c.id===id)||{name:'؟',icon:'❓'};
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('on',s.id===id));window.scrollTo(0,0)}
+let toastT;function toast(m){const t=$('toast');t.textContent=m;t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),2200)}
+function openG(html){$('mgBox').innerHTML=html;$('mg').classList.add('on')}
+function closeG(){$('mg').classList.remove('on')}
+// options shuffled for display; returns [{t,ok}]
+function mixOpts(q){return shuffle(q.opts.map((t,i)=>({t,ok:i===q.a})).filter(o=>o.t.trim()!==''))}
+
+/* ================= SOUND ================= */
+let AC;
+function beep(freqs,dur=.12,type='sine',vol=.15){
+  if(!DB.sound)return;
+  try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();
+    freqs.forEach((f,i)=>{const o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.value=f;
+      const t=AC.currentTime+i*dur;g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.001,t+dur*1.6);
+      o.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+dur*1.7)})}catch(e){}
+}
+const SFX={ok:()=>beep([523,659,784],.1,'triangle'),bad:()=>beep([220,165],.18,'sawtooth',.08),
+  tick:()=>beep([880],.04,'square',.04),win:()=>beep([523,659,784,1047,784,1047],.13,'triangle'),
+  key:()=>beep([784,988,1319],.09,'triangle'),click:()=>beep([600],.04,'sine',.06)};
+function toggleSound(){DB.sound=!DB.sound;save();syncSnd();if(DB.sound)SFX.click()}
+function syncSnd(){['sndBtn','sndBtn2'].forEach(i=>$(i).textContent=DB.sound?'🔊':'🔇')}
+syncSnd();
+
+/* ================= CONFETTI ================= */
+function confetti(n=160){
+  const c=$('fx'),x=c.getContext('2d');c.width=innerWidth;c.height=innerHeight;
+  const cols=['#f2c14e','#ffdd85','#2fbf71','#4c8dff','#e5484d','#fff'];
+  let P=Array.from({length:n},()=>({x:Math.random()*c.width,y:-20-Math.random()*c.height*.5,vx:(Math.random()-.5)*3,vy:2+Math.random()*4,r:Math.random()*6.28,vr:(Math.random()-.5)*.3,s:5+Math.random()*7,c:cols[Math.random()*cols.length|0]}));
+  let f=0;(function loop(){x.clearRect(0,0,c.width,c.height);P.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.r+=p.vr;x.save();x.translate(p.x,p.y);x.rotate(p.r);x.fillStyle=p.c;x.fillRect(-p.s/2,-p.s/4,p.s,p.s/2);x.restore()});
+    if(++f<240)requestAnimationFrame(loop);else x.clearRect(0,0,c.width,c.height)})();
+}
+
+/* ================= LEADERBOARD ================= */
+function renderLB(){
+  const l=DB.lb.slice(0,10);
+  $('lbList').innerHTML=l.length?l.map(r=>`<li><span>${esc(r.n)} <small class="mute">· ${esc(r.c)}${r.w?' · 👑':''}</small></span><b style="color:var(--gold2)">${AR(r.s)}</b></li>`).join('')
+   :'<p class="mute" style="margin:6px 0 0">لا يوجد أبطال بعد. كن أول من يدخل القصر.</p>';
+}
+renderLB();
+
+/* ================= ADVENTURE ================= */
+const QPR=4,NEED=3,QTIME=20;
+let A=null,timerI=null;
+function advStart(){
+  if(DB.cats.filter(c=>DB.qs.filter(q=>q.cat===c.id).length>=QPR).length===0){toast('أضف أسئلة من لوحة المعلم أولاً');return}
+  show('s-aname');setTimeout(()=>$('pName').focus(),200);
+}
+function advBegin(){
+  const n=$('pName').value.trim();if(!n){toast('اكتب اسمك أولاً');return}
+  const rooms=DB.cats.filter(c=>DB.qs.filter(q=>q.cat===c.id).length>=QPR).map(c=>c.id);
+  A={name:n,cls:$('pClass').value,rooms,done:[],lives:3,score:0,fifty:1,skip:1,streak:0,correct:0,total:0,used:new Set()};
+  SFX.click();advMap();
+}
+function hudLives(){return `<span class="pill">${'❤️'.repeat(A.lives)}${'🖤'.repeat(3-A.lives)}</span><span class="pill">⭐ ${AR(A.score)}</span>`}
+function advMap(){
+  show('s-amap');$('hudMap').innerHTML=hudLives()+`<span class="pill">🗝️ ${AR(A.done.length)}/${AR(A.rooms.length)}</span>`;
+  const cur=A.done.length;
+  $('rooms').innerHTML=A.rooms.map((id,i)=>{const c=catOf(id);const st=i<cur?'done':i===cur?'open':'lock';
+    return `<button class="room ${st}" onclick="advRoom(${i})">${st==='done'?'<span class="badge">🗝️</span>':st==='lock'?'<span class="badge">🔒</span>':''}<span class="ri">${c.icon}</span><b>${esc(c.name)}</b><small>الغرفة ${AR(i+1)}</small></button>`}).join('')
+   +`<div class="room ${cur>=A.rooms.length?'open':'lock'}" style="border-color:var(--gold2)"><span class="ri">💰</span><b>خزنة الكنز</b><small>${AR(A.rooms.length)} مفاتيح</small></div>`;
+}
+function confirmQuit(){if(confirm('الخروج من المغامرة؟ ستفقد تقدمك.')){stopTimer();show('s-home')}}
+function advRoom(i){
+  const id=A.rooms[i];
+  let pool=DB.qs.filter(q=>q.cat===id&&!A.used.has(q.id));
+  if(pool.length<QPR)pool=DB.qs.filter(q=>q.cat===id);
+  const picked=shuffle(pool).slice(0,QPR).sort((a,b)=>a.lvl-b.lvl);
+  A.r={i,id,qs:picked,k:0,ok:0};SFX.click();advQ();
+}
+function advQ(){
+  const R=A.r,q=R.qs[R.k];A.used.add(q.id);A.lock=false;
+  show('s-aq');const c=catOf(R.id);
+  $('aqRoom').textContent=`${c.icon} ${c.name} — سؤال ${AR(R.k+1)} من ${AR(QPR)}`;
+  $('hudQ').innerHTML=hudLives();
+  $('aqText').textContent=q.q;$('aqFb').textContent='';
+  A.cur=mixOpts(q);
+  $('aqOpts').innerHTML=A.cur.map((o,j)=>`<button class="opt" data-j="${j}" onclick="advAns(${j})"><span class="k">${KEYS[j]}</span><span>${esc(o.t)}</span></button>`).join('');
+  $('ll50').disabled=!A.fifty;$('llSkip').disabled=!A.skip;
+  startTimer(QTIME,$('aqTimer'),()=>advAns(-1));
+}
+function startTimer(sec,bar,onEnd){
+  stopTimer();let left=sec*4;bar.style.width='100%';
+  timerI=setInterval(()=>{left--;bar.style.width=(left/(sec*4)*100)+'%';if(left<=20&&left%4===0)SFX.tick();
+    if(left<=0){stopTimer();onEnd()}},250);
+  timerI.left=()=>left/4;
+  window._tleft=()=>left/4;
+}
+function stopTimer(){clearInterval(timerI);timerI=null}
+function advAns(j){
+  if(A.lock)return;A.lock=true;const left=window._tleft?window._tleft():0;stopTimer();
+  const R=A.r,q=R.qs[R.k],btns=[...$('aqOpts').children];
+  btns.forEach(b=>b.disabled=true);
+  const okIdx=A.cur.findIndex(o=>o.ok);btns[okIdx].classList.add('ok');
+  A.total++;
+  if(j===okIdx){
+    R.ok++;A.correct++;A.streak++;
+    const gain=q.lvl*100+Math.round(left)*5+(A.streak>=3?50:0);A.score+=gain;
+    $('aqFb').innerHTML=`<span style="color:var(--ok)">✔ أحسنت! +${AR(gain)}${A.streak>=3?' 🔥':''}</span>`;SFX.ok();
+  }else{
+    if(j>=0)btns[j].classList.add('bad');
+    A.lives--;A.streak=0;
+    $('aqFb').innerHTML=`<span style="color:var(--bad)">${j<0?'⏰ انتهى الوقت!':'✘ إجابة خاطئة'} — خسرت روحاً</span>`;SFX.bad();
+  }
+  $('hudQ').innerHTML=hudLives();
+  setTimeout(advNext,1600);
+}
+function advNext(){
+  const R=A.r;
+  if(A.lives<=0)return advEnd(false);
+  R.k++;
+  if(R.k<QPR)return advQ();
+  if(R.ok>=NEED){
+    A.done.push(R.id);SFX.key();
+    if(A.done.length>=A.rooms.length)return advEnd(true);
+    openG(`<div class="center"><div class="big">🗝️</div><h2>حصلت على مفتاح ${esc(catOf(R.id).name)}!</h2><p class="mute">أجبت عن ${AR(R.ok)} من ${AR(QPR)}. انتقل إلى الغرفة التالية.</p><button class="btn gold" onclick="closeG();advMap()">إلى الخريطة 🗺️</button></div>`);
+  }else{
+    openG(`<div class="center"><div class="big">💂</div><h2>الحارس أغلق الباب!</h2><p class="mute">أجبت عن ${AR(R.ok)} من ${AR(QPR)} فقط، والمطلوب ${AR(NEED)}. حاول مرة أخرى بأسئلة جديدة.</p><button class="btn gold" onclick="closeG();advMap()">حاول مجدداً</button></div>`);
+  }
+}
+function adv5050(){
+  if(!A.fifty||A.lock)return;A.fifty=0;$('ll50').disabled=true;SFX.click();
+  const btns=[...$('aqOpts').children];
+  shuffle(A.cur.map((o,j)=>j).filter(j=>!A.cur[j].ok)).slice(0,2).forEach(j=>btns[j].classList.add('gone'));
+}
+function advSkip(){
+  if(!A.skip||A.lock)return;A.skip=0;A.lock=true;stopTimer();SFX.click();
+  // replace current question with another unused one from same room
+  const R=A.r;const pool=shuffle(DB.qs.filter(q=>q.cat===R.id&&!A.used.has(q.id)&&!R.qs.includes(q)));
+  if(pool.length){R.qs[R.k]=pool[0];advQ()}else{R.ok++;toast('تم احتساب السؤال لك');advNext()}
+}
+function advEnd(win){
+  stopTimer();closeG();
+  if(win)A.score+=A.lives*300;
+  DB.lb.push({n:A.name,c:A.cls,s:A.score,w:win,d:Date.now()});DB.lb.sort((a,b)=>b.s-a.s);DB.lb=DB.lb.slice(0,50);save();
+  const rank=DB.lb.findIndex(r=>r.d&&r.n===A.name&&r.s===A.score)+1;
+  const pct=A.total?Math.round(A.correct/A.total*100):0;
+  $('aendBox').innerHTML=win
+   ?`<div class="chest">💰</div><h1 style="color:var(--gold2)">فتحت خزنة الكنز!</h1><p>أحسنت يا ${esc(A.name)}، أنت حارس القصر الجديد 👑</p>`
+   :`<div class="big">💀</div><h1>انتهت الأرواح</h1><p class="mute">وصلت إلى ${AR(A.done.length)} من ${AR(A.rooms.length)} مفاتيح. لا بأس، المحاولة القادمة أقوى.</p>`;
+  $('aendBox').innerHTML+=`<div class="row" style="justify-content:center;margin:14px 0"><span class="pill">⭐ ${AR(A.score)} نقطة</span><span class="pill">🎯 ${AR(pct)}٪ دقة</span>${rank&&rank<=10?`<span class="pill">🏆 المركز ${AR(rank)}</span>`:''}${win?`<span class="pill">❤️ مكافأة ${AR(A.lives*300)}</span>`:''}</div>
+   <div class="row" style="justify-content:center"><button class="btn gold" onclick="advBegin()">العب مجدداً</button><button class="btn" onclick="show('s-home');renderLB()">الرئيسية</button></div>`;
+  show('s-aend');if(win){SFX.win();confetti()}else SFX.bad();
+}
+
+/* ================= TEAMS ================= */
+const TCOL=['#4c8dff','#e5484d','#2fbf71','#f2c14e'];
+const TDEF=['الصقور','النمور','الفرسان','النجوم'];
+let T={n:2,names:TDEF.slice(),cats:[],time:30};
+function renderSetup(){
+  if(!T.cats.length)T.cats=DB.cats.slice(0,6).map(c=>c.id);
+  T.cats=T.cats.filter(id=>DB.cats.some(c=>c.id===id));
+  $('teamCount').innerHTML=[2,3,4].map(n=>`<button class="chip ${T.n===n?'on':''}" onclick="T.n=${n};renderSetup()">${AR(n)} فرق</button>`).join('');
+  $('teamNames').innerHTML=Array.from({length:T.n},(_,i)=>`<label style="color:${TCOL[i]}">الفريق ${AR(i+1)}<input value="${esc(T.names[i])}" oninput="T.names[${i}]=this.value" style="border-color:${TCOL[i]}"></label>`).join('');
+  $('catPick').innerHTML=DB.cats.map(c=>`<button class="chip ${T.cats.includes(c.id)?'on':''}" onclick="pickCat('${c.id}')">${c.icon} ${esc(c.name)}</button>`).join('');
+  $('timePick').innerHTML=[20,30,45,60].map(s=>`<button class="chip ${T.time===s?'on':''}" onclick="T.time=${s};renderSetup()">${AR(s)} ث</button>`).join('');
+}
+function pickCat(id){const i=T.cats.indexOf(id);if(i>=0)T.cats.splice(i,1);else if(T.cats.length<6)T.cats.push(id);else toast('الحد الأقصى ٦ أقسام');renderSetup()}
+let G=null;
+function boardStart(){
+  if(T.cats.length<2){toast('اختر قسمين على الأقل');return}
+  const cols=T.cats.map(id=>{
+    const qs=DB.qs.filter(q=>q.cat===id);const used=new Set();
+    const cells=[1,2,3,4,5].map(l=>{
+      let c=shuffle(qs.filter(q=>q.lvl===l&&!used.has(q.id)));
+      if(!c.length)c=qs.filter(q=>!used.has(q.id)).sort((a,b)=>Math.abs(a.lvl-l)-Math.abs(b.lvl-l));
+      const q=c[0];if(q)used.add(q.id);return{q,pts:l*100,used:!q};
+    });return{id,cells}});
+  G={teams:Array.from({length:T.n},(_,i)=>({n:T.names[i].trim()||TDEF[i],c:TCOL[i],s:0,fifty:1,time:1})),cols,turn:0};
+  SFX.win();renderBoard();show('s-board');
+}
+function nextTurn(){G.turn=(G.turn+1)%G.teams.length}
+function renderBoard(){
+  $('scores').innerHTML=G.teams.map((t,i)=>`<div class="score ${i===G.turn?'turn':''}" style="--tc:${t.c}"><div><div class="nm">${i===G.turn?'▶ ':''}${esc(t.n)}</div><div class="lf">${t.fifty?'✂️':'<s>✂️</s>'} ${t.time?'⏱️':'<s>⏱️</s>'}</div></div><div class="pt">${AR(t.s)}</div></div>`).join('');
+  const n=G.cols.length;$('board').style.gridTemplateColumns=`repeat(${n},minmax(0,1fr))`;
+  let h=G.cols.map(c=>{const k=catOf(c.id);return`<div class="bh"><span>${k.icon}</span>${esc(k.name)}</div>`}).join('');
+  for(let r=0;r<5;r++)h+=G.cols.map((c,ci)=>{const x=c.cells[r];return`<button class="cell ${x.used?'used':''}" onclick="openCell(${ci},${r})">${AR(x.pts)}</button>`}).join('');
+  $('board').innerHTML=h;
+  if(G.cols.every(c=>c.cells.every(x=>x.used)))setTimeout(boardEnd,600);
+}
+let M=null;
+function openCell(ci,r){
+  const x=G.cols[ci].cells[r];if(x.used)return;SFX.click();
+  M={ci,r,x,q:x.q,opts:mixOpts(x.q),team:G.turn,phase:'ans',extra:0};
+  renderMQ();$('mq').classList.add('on');
+  startTimer(T.time,$('mqTimer'),()=>mAns(-1));
+}
+function renderMQ(){
+  const t=G.teams[M.team],k=catOf(G.cols[M.ci].id);
+  $('mqBox').innerHTML=`
+   <div class="qhead"><span class="pill">${k.icon} ${esc(k.name)} — ${AR(M.x.pts)} نقطة</span><span class="pill" style="border-color:${t.c};color:${t.c}">دور: ${esc(t.n)}</span></div>
+   <div class="timer"><i id="mqTimer"></i></div>
+   <div class="card qtext" style="font-size:clamp(22px,3.4vw,34px)">${esc(M.q.q)}</div>
+   <div class="opts" id="mqOpts" style="margin-top:12px">${M.opts.map((o,j)=>`<button class="opt" onclick="mAns(${j})"><span class="k">${KEYS[j]}</span><span>${esc(o.t)}</span></button>`).join('')}</div>
+   <div class="feedback" id="mqFb"></div>
+   <div class="lifes" id="mqLL">
+     <button class="btn sm" ${t.fifty?'':'disabled'} onclick="m5050()">✂️ حذف إجابتين</button>
+     <button class="btn sm" ${t.time?'':'disabled'} onclick="mTime()">⏱️ +١٥ ثانية</button>
+     <button class="btn sm ghost" onclick="mAns(-2)">👁️ إظهار الإجابة</button>
+   </div>
+   <div class="steal" id="mqSteal"></div>`;
+}
+function m5050(){const t=G.teams[M.team];if(!t.fifty||M.phase!=='ans')return;t.fifty=0;SFX.click();
+  const b=[...$('mqOpts').children];shuffle(M.opts.map((o,j)=>j).filter(j=>!M.opts[j].ok)).slice(0,2).forEach(j=>b[j].classList.add('gone'));
+  $('mqLL').children[0].disabled=true}
+function mTime(){const t=G.teams[M.team];if(!t.time||M.phase!=='ans')return;t.time=0;SFX.click();
+  const left=window._tleft();startTimer(left+15,$('mqTimer'),()=>mAns(-1));$('mqTimer').style.width=Math.min(100,(left+15)/T.time*100)+'%';$('mqLL').children[1].disabled=true}
+function mAns(j){
+  if(M.phase!=='ans')return;M.phase='done';stopTimer();
+  const b=[...$('mqOpts').children];b.forEach(x=>x.disabled=true);
+  const ok=M.opts.findIndex(o=>o.ok);b[ok].classList.add('ok');$('mqLL').style.display='none';
+  const t=G.teams[M.team];
+  if(j===ok){t.s+=M.x.pts;SFX.ok();confetti(60);
+    $('mqFb').innerHTML=`<span style="color:var(--ok)">✔ إجابة صحيحة! +${AR(M.x.pts)} لفريق ${esc(t.n)}</span>`;
+    $('mqSteal').innerHTML=`<button class="btn gold" onclick="mClose()">متابعة ←</button>`;
+  }else{
+    if(j>=0)b[j].classList.add('bad');SFX.bad();
+    $('mqFb').innerHTML=`<span style="color:var(--bad)">${j===-1?'⏰ انتهى الوقت':j===-2?'الإجابة الصحيحة':'✘ إجابة خاطئة'}</span>`;
+    const others=G.teams.map((x,i)=>({x,i})).filter(o=>o.i!==M.team);
+    $('mqSteal').innerHTML=`<p class="mute" style="margin:0 0 8px">هل عرفها فريق آخر؟ (سرقة بنصف النقاط: ${AR(M.x.pts/2)})</p>
+      <div class="row" style="justify-content:center">${others.map(o=>`<button class="btn sm" style="border-color:${o.x.c};color:${o.x.c}" onclick="mSteal(${o.i})">🦊 ${esc(o.x.n)}</button>`).join('')}
+      <button class="btn sm gold" onclick="mClose()">لا أحد ←</button></div>`;
+  }
+}
+function mSteal(i){G.teams[i].s+=M.x.pts/2;SFX.ok();toast(`+${AR(M.x.pts/2)} لفريق ${G.teams[i].n}`);mClose()}
+function mClose(){M.x.used=true;stopTimer();$('mq').classList.remove('on');nextTurn();renderBoard()}
+function boardEnd(){
+  if(!$('s-board').classList.contains('on'))return;
+  const s=G.teams.slice().sort((a,b)=>b.s-a.s);const top=s[0].s;const winners=s.filter(t=>t.s===top);
+  const medals=['🥇','🥈','🥉','🎖️'];
+  $('tendBox').innerHTML=`<div class="chest">🏆</div><h1 style="color:var(--gold2)">${winners.length>1?'تعادل!':'الفائز: '+esc(winners[0].n)}</h1>
+   <div style="margin:16px auto;max-width:380px;display:grid;gap:8px">${s.map((t,i)=>`<div class="score" style="--tc:${t.c}"><span class="nm">${medals[i]} ${esc(t.n)}</span><span class="pt">${AR(t.s)}</span></div>`).join('')}</div>
+   <div class="row" style="justify-content:center"><button class="btn gold" onclick="show('s-tsetup');renderSetup()">تحدٍّ جديد</button><button class="btn" onclick="show('s-home')">الرئيسية</button></div>`;
+  show('s-tend');SFX.win();confetti(220);
+}
+
+/* ================= TEACHER ================= */
+let tFilter='all',tCurTab='q';
+function openTeacher(){
+  openG(`<h2>🔐 رمز المعلم</h2><p class="mute" style="margin:4px 0 12px">الرمز الافتراضي 1234، ويمكنك تغييره من الإعدادات.</p>
+   <input id="pinIn" type="password" inputmode="numeric" placeholder="••••" onkeydown="if(event.key==='Enter')checkPin()">
+   <div class="row" style="margin-top:12px"><button class="btn gold" onclick="checkPin()">دخول</button><button class="btn ghost" onclick="closeG()">إلغاء</button></div>`);
+  setTimeout(()=>$('pinIn').focus(),100);
+}
+function checkPin(){if($('pinIn').value===DB.pin){closeG();show('s-teacher');tTab('q')}else{SFX.bad();toast('الرمز غير صحيح')}}
+function tTab(t){tCurTab=t;document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('on',b.dataset.t===t));({q:tQs,c:tCats,s:tSet})[t]()}
+function tQs(){
+  const list=DB.qs.filter(q=>tFilter==='all'||q.cat===tFilter).sort((a,b)=>a.cat.localeCompare(b.cat)||a.lvl-b.lvl);
+  $('tBody').innerHTML=`<div class="card">
+    <div class="row" style="justify-content:space-between;margin-bottom:10px">
+      <select style="width:auto;flex:1;min-width:160px" onchange="tFilter=this.value;tQs()"><option value="all">كل الأقسام (${AR(DB.qs.length)})</option>${DB.cats.map(c=>`<option value="${c.id}" ${tFilter===c.id?'selected':''}>${c.icon} ${esc(c.name)} (${AR(DB.qs.filter(q=>q.cat===c.id).length)})</option>`).join('')}</select>
+      <button class="btn gold sm" onclick="qForm()">＋ سؤال جديد</button>
+    </div>
+    ${list.map(q=>`<div class="qitem"><span class="lvl">${AR(q.lvl*100)}</span><div class="t"><b>${esc(q.q)}</b><small>${catOf(q.cat).icon} ${esc(catOf(q.cat).name)} · ✔ ${esc(q.opts[q.a])}</small></div>
+      <button class="btn sm" onclick="qForm('${q.id}')">✏️</button></div>`).join('')||'<p class="mute">لا توجد أسئلة.</p>'}
+    <p class="mute" style="font-size:13px;margin-top:10px">💡 المغامرة تحتاج ${AR(QPR)} أسئلة على الأقل في القسم، ولوحة الفرق تحتاج سؤالاً لكل مستوى (١٠٠–٥٠٠).</p>
+  </div>`;
+}
+function qForm(id){
+  const q=id?DB.qs.find(x=>x.id===id):{cat:tFilter!=='all'?tFilter:DB.cats[0]?.id,lvl:1,q:'',opts:['','','',''],a:0};
+  openG(`<h2>${id?'تعديل سؤال':'سؤال جديد'}</h2><div class="form" style="margin-top:12px">
+    <label>القسم<select id="fCat">${DB.cats.map(c=>`<option value="${c.id}" ${q.cat===c.id?'selected':''}>${c.icon} ${esc(c.name)}</option>`).join('')}</select></label>
+    <label>الصعوبة (نقاط لوحة الفرق)<select id="fLvl">${[1,2,3,4,5].map(l=>`<option value="${l}" ${q.lvl===l?'selected':''}>${AR(l*100)} — ${['سهل جداً','سهل','متوسط','صعب','صعب جداً'][l-1]}</option>`).join('')}</select></label>
+    <label>نص السؤال<textarea id="fQ" rows="2">${esc(q.q)}</textarea></label>
+    <label>الخيارات (حدّد الصحيح)</label>
+    ${[0,1,2,3].map(i=>`<div class="optedit"><input type="radio" name="fA" value="${i}" ${q.a===i?'checked':''}><input id="fO${i}" value="${esc(q.opts[i]||'')}" placeholder="الخيار ${KEYS[i]}${i>1?' (اختياري)':''}"></div>`).join('')}
+    <div class="row"><button class="btn gold" onclick="qSave('${id||''}')">حفظ</button><button class="btn ghost" onclick="closeG()">إلغاء</button>${id?`<button class="btn red sm" style="margin-inline-start:auto" onclick="qDel('${id}')">🗑️ حذف</button>`:''}</div>
+  </div>`);
+}
+function qSave(id){
+  const opts=[0,1,2,3].map(i=>$('fO'+i).value.trim());const a=+document.querySelector('input[name=fA]:checked').value;
+  const text=$('fQ').value.trim();
+  if(!text){toast('اكتب نص السؤال');return}
+  if(opts.filter(Boolean).length<2){toast('أدخل خيارين على الأقل');return}
+  if(!opts[a]){toast('الخيار الصحيح فارغ');return}
+  const d={cat:$('fCat').value,lvl:+$('fLvl').value,q:text,opts,a};
+  if(id)Object.assign(DB.qs.find(x=>x.id===id),d);else DB.qs.push({id:uid(),...d});
+  save();closeG();toast('تم الحفظ ✔');tQs();
+}
+function qDel(id){if(!confirm('حذف هذا السؤال؟'))return;DB.qs=DB.qs.filter(q=>q.id!==id);save();closeG();toast('تم الحذف');tQs()}
+function tCats(){
+  $('tBody').innerHTML=`<div class="card">
+    ${DB.cats.map((c,i)=>`<div class="qitem" style="align-items:center"><input value="${esc(c.icon)}" style="width:56px;text-align:center" onchange="DB.cats[${i}].icon=this.value;save()"><input value="${esc(c.name)}" style="flex:1" onchange="DB.cats[${i}].name=this.value;save()">
+      <button class="btn sm" onclick="catMove(${i},-1)" ${i===0?'disabled':''}>▲</button><button class="btn sm red" onclick="catDel(${i})">🗑️</button></div>`).join('')}
+    <div class="row" style="margin-top:12px"><button class="btn gold sm" onclick="catAdd()">＋ قسم جديد</button><span class="mute" style="font-size:13px">ترتيب الأقسام = ترتيب غرف القصر</span></div></div>`;
+}
+function catAdd(){const n=prompt('اسم القسم الجديد:');if(!n)return;DB.cats.push({id:uid(),name:n.trim(),icon:'⭐'});save();tCats()}
+function catMove(i,d){const j=i+d;[DB.cats[i],DB.cats[j]]=[DB.cats[j],DB.cats[i]];save();tCats()}
+function catDel(i){const c=DB.cats[i];const n=DB.qs.filter(q=>q.cat===c.id).length;
+  if(!confirm(`حذف قسم «${c.name}» و${n} سؤالاً بداخله؟`))return;DB.qs=DB.qs.filter(q=>q.cat!==c.id);DB.cats.splice(i,1);save();tCats()}
+function tSet(){
+  $('tBody').innerHTML=`<div class="card form">
+    <h3>💾 نسخ الأسئلة ونقلها</h3>
+    <p class="mute" style="margin:0;font-size:14px">البيانات محفوظة على هذا الجهاز. صدّر ملف الأسئلة ثم استورده على جهاز الفصل أو أرسله لزميل.</p>
+    <div class="row"><button class="btn" onclick="expJson()">⬇️ تصدير الأسئلة</button><label class="btn" style="color:var(--ink);font-size:inherit">⬆️ استيراد ملف<input type="file" accept=".json,application/json" style="display:none" onchange="impJson(this.files[0])"></label></div>
+    <hr style="border:0;border-top:1px solid var(--line);width:100%">
+    <h3>🔑 رمز المعلم</h3>
+    <div class="row"><input id="newPin" type="password" inputmode="numeric" placeholder="رمز جديد" style="flex:1;width:auto"><button class="btn sm" onclick="setPin()">تغيير</button></div>
+    <hr style="border:0;border-top:1px solid var(--line);width:100%">
+    <h3>🧹 إعادة الضبط</h3>
+    <div class="row"><button class="btn red sm" onclick="if(confirm('مسح لوحة الأبطال؟')){DB.lb=[];save();toast('تم المسح')}">مسح لوحة الأبطال</button>
+    <button class="btn red sm" onclick="resetAll()">استعادة الأسئلة الأصلية</button></div>
+  </div>`;
+}
+function setPin(){const p=$('newPin').value.trim();if(p.length<4){toast('الرمز ٤ أرقام على الأقل');return}DB.pin=p;save();toast('تم تغيير الرمز ✔');$('newPin').value=''}
+function resetAll(){if(!confirm('سيتم حذف كل أسئلتك وأقسامك واستعادة الأسئلة الأصلية. متأكد؟'))return;const d=defaults();d.pin=DB.pin;d.lb=DB.lb;d.sound=DB.sound;DB=d;save();toast('تمت الاستعادة');tTab('q')}
+async function expJson(){
+  const data=JSON.stringify({app:'qasr',v:1,cats:DB.cats,qs:DB.qs},null,1);
+  const name='أسئلة-حارس-القصر.json';
+  try{const f=new File([data],name,{type:'application/json'});
+    if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:'أسئلة حارس القصر'});return}}catch(e){if(e.name==='AbortError')return}
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([data],{type:'application/json'}));a.download=name;document.body.appendChild(a);a.click();a.remove();
+}
+function impJson(file){
+  if(!file)return;const r=new FileReader();
+  r.onload=()=>{try{const d=JSON.parse(r.result);if(!Array.isArray(d.cats)||!Array.isArray(d.qs))throw 0;
+    const mode=confirm('اضغط «موافق» لاستبدال كل الأسئلة الحالية، أو «إلغاء» لدمجها مع الموجودة.');
+    if(mode){DB.cats=d.cats;DB.qs=d.qs}else{d.cats.forEach(c=>{if(!DB.cats.some(x=>x.id===c.id))DB.cats.push(c)});d.qs.forEach(q=>{if(!DB.qs.some(x=>x.id===q.id))DB.qs.push(q)})}
+    save();toast(`تم الاستيراد: ${AR(d.qs.length)} سؤال`);tTab('q')}catch(e){toast('الملف غير صالح')}};
+  r.readAsText(file);
+}
+document.addEventListener('keydown',e=>{
+  if($('mq').classList.contains('on')&&M&&M.phase==='ans'){const i='1234'.indexOf(e.key);if(i>=0&&i<M.opts.length)mAns(i)}
+  if($('s-aq').classList.contains('on')&&A&&!A.lock){const i='1234'.indexOf(e.key);if(i>=0&&i<A.cur.length)advAns(i)}
+});
+</script>
+</body>
+</html>
